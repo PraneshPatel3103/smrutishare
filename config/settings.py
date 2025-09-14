@@ -1,19 +1,33 @@
-
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-import os
 import dj_database_url
 
 load_dotenv()
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret')
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = ["*"]  # or ["your-app-name.up.railway.app"]
+# --- Core Settings ---
+SECRET_KEY = os.getenv('SECRET_KEY', 'a-strong-dev-secret-key-that-is-long')
+# DEBUG is False by default on Railway, True if you set DEBUG=True
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
+# --- Railway Deployment Settings ---
+# This is the most important security setting.
+ALLOWED_HOSTS = []
+CSRF_TRUSTED_ORIGINS = []
 
+RAILWAY_STATIC_URL = os.environ.get('RAILWAY_STATIC_URL')
+if RAILWAY_STATIC_URL:
+    # Add the Railway URL to both settings
+    ALLOWED_HOSTS.append(RAILWAY_STATIC_URL)
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RAILWAY_STATIC_URL}")
+else:
+    # Allow local development hosts if not on Railway
+    ALLOWED_HOSTS.extend(['127.0.0.1', 'localhost'])
+
+# --- Application Definition ---
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -26,6 +40,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware", # Whitenoise should be second
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -35,6 +50,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'config.urls'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 TEMPLATES = [
     {
@@ -52,15 +68,19 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
-
-import dj_database_url
-
+# --- Database ---
+# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+# NOTE: For production, you should add a PostgreSQL database in Railway.
+# The DATABASE_URL will be set automatically. SQLite data is deleted on each deploy.
 DATABASES = {
-    "default": dj_database_url.config(default=f"sqlite:///{BASE_DIR}/db.sqlite3")
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR}/db.sqlite3",
+        conn_max_age=600
+    )
 }
 
-
+# --- Password Validation ---
+# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 8}},
@@ -68,56 +88,46 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# --- Internationalization ---
+# https://docs.djangoproject.com/en/4.2/topics/i18n/
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
+# --- Static files (CSS, JavaScript, Images) ---
+# https://docs.djangoproject.com/en/4.2/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-MEDIA_URL = os.getenv('MEDIA_URL', '/media/')
-MEDIA_ROOT = Path(os.getenv('MEDIA_ROOT', BASE_DIR / '.media'))
+# --- Media Files ---
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / '.media'
 
+# --- App Specific Settings ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 AUTH_USER_MODEL = 'core.User'
-
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'core.auth_backend.PhoneOrUsernameBackend',
 ]
 
-# Google Drive config (optional)
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'
+
+# --- Google Drive Config ---
 GDRIVE_SERVICE_ACCOUNT_FILE = os.getenv('GDRIVE_SERVICE_ACCOUNT_FILE', '')
-
 if GDRIVE_SERVICE_ACCOUNT_FILE:
-    from pathlib import Path
-    from google.oauth2 import service_account
-
     gdrive_path = Path(GDRIVE_SERVICE_ACCOUNT_FILE)
-
-    # if relative, resolve against BASE_DIR
     if not gdrive_path.is_absolute():
         gdrive_path = BASE_DIR / gdrive_path
-
-    GDRIVE_SERVICE_ACCOUNT_FILE = gdrive_path
-
+    
+    from google.oauth2 import service_account
     GOOGLE_DRIVE_CREDENTIALS = service_account.Credentials.from_service_account_file(
-        str(GDRIVE_SERVICE_ACCOUNT_FILE),
+        str(gdrive_path),
         scopes=['https://www.googleapis.com/auth/drive.file']
     )
 else:
     GOOGLE_DRIVE_CREDENTIALS = None
-
-
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/login/'
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
-DATABASES = {
-    "default": dj_database_url.config(default="sqlite:///db.sqlite3")
-}

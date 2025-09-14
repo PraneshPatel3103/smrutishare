@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
+import json
 
 load_dotenv()
 
@@ -19,7 +20,8 @@ ALLOWED_HOSTS = [
     'hpsmrutishare.up.railway.app',
     '127.0.0.1', # Keep for local development
     'localhost', ]
-CSRF_TRUSTED_ORIGINS = ['hpsmrutishare.up.railway.app']
+# This is CORRECT
+CSRF_TRUSTED_ORIGINS = ['https://hpsmrutishare.up.railway.app']
 
 RAILWAY_STATIC_URL = os.environ.get('RAILWAY_STATIC_URL')
 if RAILWAY_STATIC_URL:
@@ -121,16 +123,27 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 # --- Google Drive Config ---
-GDRIVE_SERVICE_ACCOUNT_FILE = os.getenv('GDRIVE_SERVICE_ACCOUNT_FILE', '')
-if GDRIVE_SERVICE_ACCOUNT_FILE:
-    gdrive_path = Path(GDRIVE_SERVICE_ACCOUNT_FILE)
-    if not gdrive_path.is_absolute():
-        gdrive_path = BASE_DIR / gdrive_path
-    
-    from google.oauth2 import service_account
-    GOOGLE_DRIVE_CREDENTIALS = service_account.Credentials.from_service_account_file(
-        str(gdrive_path),
-        scopes=['https://www.googleapis.com/auth/drive.file']
-    )
+# settings.py
+import json
+
+# --- Google Drive Config ---
+# This code correctly reads the credentials from the environment variable.
+GDRIVE_CREDENTIALS_JSON_STRING = os.getenv('GDRIVE_SERVICE_ACCOUNT_FILE', '')
+
+if GDRIVE_CREDENTIALS_JSON_STRING:
+    try:
+        # Load the JSON string into a Python dictionary
+        gdrive_credentials_dict = json.loads(GDRIVE_CREDENTIALS_JSON_STRING)
+
+        from google.oauth2 import service_account
+        # Use from_service_account_info(), which accepts a dictionary
+        GOOGLE_DRIVE_CREDENTIALS = service_account.Credentials.from_service_account_info(
+            gdrive_credentials_dict,
+            scopes=['https://www.googleapis.com/auth/drive.file']
+        )
+    except json.JSONDecodeError:
+        # Handle cases where the env var is not valid JSON
+        GOOGLE_DRIVE_CREDENTIALS = None
+        print("WARNING: Could not decode GDRIVE_SERVICE_ACCOUNT_FILE JSON string.")
 else:
     GOOGLE_DRIVE_CREDENTIALS = None

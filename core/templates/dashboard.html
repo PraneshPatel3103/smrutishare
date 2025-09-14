@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<!-- Header Section -->
+<div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-5 animate-fade-in">
+  <div class="mb-3 mb-md-0">
+    <h2 class="title-responsive fw-bold text-white mb-2">
+      <i class="fas fa-tachometer-alt me-3 text-primary"></i>Your Requests
+    </h2>
+    <p class="text-responsive opacity-75 mb-0">Manage and track all your requests in one place</p>
+  </div>
+  <a class="btn btn-primary px-4 py-3 animate-scale-in" href="{% url 'request_create' %}">
+    <i class="fas fa-plus me-2"></i>Create New Request
+  </a>
+</div>
+
+{% if requests_with_files %}
+  <!-- Stats Overview -->
+  <div class="row g-3 mb-5">
+    <div class="col-6 col-md-3">
+      <div class="glass-card p-3 text-center animate-slide-up">
+        <i class="fas fa-file-alt fa-2x mb-2 text-primary"></i>
+        <h4 class="fw-bold mb-1">{{ requests_with_files|length }}</h4>
+        <small class="opacity-75">Total Requests</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="glass-card p-3 text-center animate-slide-up" style="animation-delay: 0.1s;">
+        <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+        <h4 class="fw-bold mb-1">
+          {% for r, drive_link in requests_with_files %}
+            {% if r.status == 'resolved' %}1{% endif %}
+          {% empty %}0{% endfor %}
+        </h4>
+        <small class="opacity-75">Resolved</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="glass-card p-3 text-center animate-slide-up" style="animation-delay: 0.2s;">
+        <i class="fas fa-clock fa-2x mb-2 text-warning"></i>
+        <h4 class="fw-bold mb-1">
+          {% for r, drive_link in requests_with_files %}
+            {% if r.status == 'pending' %}1{% endif %}
+          {% empty %}0{% endfor %}
+        </h4>
+        <small class="opacity-75">Pending</small>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="glass-card p-3 text-center animate-slide-up" style="animation-delay: 0.3s;">
+        <i class="fas fa-cloud fa-2x mb-2 text-info"></i>
+        <h4 class="fw-bold mb-1">
+          {% for r, drive_link in requests_with_files %}
+            {% if drive_link %}1{% endif %}
+          {% empty %}0{% endfor %}
+        </h4>
+        <small class="opacity-75">With Files</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Requests Grid -->
+  <div class="row g-4">
+    {% for r, drive_link in requests_with_files %}
+    <div class="col-12 col-lg-6 animate-slide-up" style="animation-delay: {{ forloop.counter0|add:0.1 }}s;">
+      <div class="glass-card p-4 h-100 position-relative overflow-hidden">
+        <!-- Status Badge -->
+        <div class="position-absolute top-0 end-0 m-3">
+          {% if r.status == 'resolved' %}
+            <span class="badge bg-success px-3 py-2 rounded-pill">
+              <i class="fas fa-check-circle me-1"></i>{{ r.status|capfirst }}
+            </span>
+          {% else %}
+            <span class="badge bg-warning px-3 py-2 rounded-pill">
+              <i class="fas fa-clock me-1"></i>{{ r.status|capfirst }}
+            </span>
+          {% endif %}
+        </div>
+
+        <!-- Request Header -->
+        <div class="mb-3">
+          <div class="d-flex align-items-center mb-2">
+            <div class="bg-primary rounded-circle p-2 me-3">
+              <i class="fas fa-file-alt text-white"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold text-white mb-1">Request #{{ r.request_number }}</h5>
+              <small class="text-white-50">
+                <i class="fas fa-calendar me-1"></i>{{ r.date }} at {{ r.time }}
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Request Details -->
+        <div class="request-details text-white mb-4">
+          <div class="row g-2">
+            <div class="col-12">
+              <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-user text-primary me-2 flex-shrink-0"></i>
+                <span class="fw-medium me-2">Name:</span>
+                <span class="text-white-75">{{ r.customer_name }}</span>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-map-marker-alt text-success me-2 flex-shrink-0"></i>
+                <span class="fw-medium me-2">Location:</span>
+                <span class="text-white-75">{{ r.location }}</span>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="d-flex align-items-start mb-2">
+                <i class="fas fa-sticky-note text-warning me-2 flex-shrink-0 mt-1"></i>
+                <div>
+                  <span class="fw-medium me-2">Notes:</span>
+                  <p class="text-white-75 mb-0 small">{{ r.note|truncatewords:15 }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex flex-column flex-sm-row gap-2 mt-auto">
+          {% if r.reference_image %}
+            <a href="{{ r.reference_image.url }}" target="_blank" class="btn btn-outline-light btn-sm flex-grow-1">
+              <i class="fas fa-paperclip me-2"></i>View Reference
+            </a>
+          {% endif %}
+          
+          {% if drive_link %}
+            <a href="{{ drive_link }}" target="_blank" class="btn btn-success btn-sm flex-grow-1">
+              <i class="fas fa-cloud-download-alt me-2"></i>Download File
+            </a>
+          {% endif %}
+          
+          {% if not r.reference_image and not drive_link %}
+            <div class="text-center text-white-50 py-2">
+              <i class="fas fa-info-circle me-1"></i>No files attached
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  
+  <!-- Pagination or Load More -->
+  {% if requests_with_files|length > 6 %}
+  <div class="text-center mt-5">
+    <button class="btn btn-outline-light px-4" onclick="loadMoreRequests()">
+      <i class="fas fa-chevron-down me-2"></i>Load More Requests
+    </button>
+  </div>
+  {% endif %}
+
+{% else %}
+  <!-- Empty State -->
+  <div class="text-center py-5 animate-scale-in">
+    <div class="glass-card p-5 mx-auto" style="max-width: 500px;">
+      <div class="mb-4">
+        <i class="fas fa-file-plus fa-4x text-primary opacity-75"></i>
+      </div>
+      <h4 class="text-white fw-bold mb-3">No Requests Yet</h4>
+      <p class="text-white-75 mb-4">You haven't created any requests yet. Get started by clicking the button below.</p>
+      <a href="{% url 'request_create' %}" class="btn btn-primary px-4 py-3">
+        <i class="fas fa-plus me-2"></i>Create Your First Request
+      </a>
+    </div>
+  </div>
+{% endif %}
+
+<style>
+  .bg-primary{background:linear-gradient(135deg,var(--primary-grad-start),var(--primary-grad-end))!important;}
+  .text-primary{color:var(--primary-grad-end)!important;}
+  .text-success{color:#45d483!important;}
+  .text-warning{color:var(--accent-grad-end)!important;}
+  .text-info{color:#23a2f6!important;}
+  .text-white-75{color:var(--muted-text-dark)!important;}
+  .text-white-50{color:var(--muted-text-darker)!important;}
+  .request-details .fw-medium{font-weight:500;min-width:80px;}
+  .badge{font-size:.75rem;box-shadow:0 2px 8px rgba(0,0,0,0.35);backdrop-filter:blur(6px);}
+  body.theme-light .badge{box-shadow:0 2px 6px rgba(0,0,0,0.12);}
+  .btn-success{background:linear-gradient(135deg,#169b55,#45d483);border:none;}
+  .btn-success:hover{background:linear-gradient(135deg,#139050,#45d483);transform:translateY(-2px);box-shadow:0 8px 25px -6px rgba(22,155,85,.55);} 
+  @media (max-width:768px){.glass-card{margin-bottom:1rem;} .request-details .d-flex{flex-direction:column;align-items:flex-start!important;} .request-details .fw-medium{min-width:auto;margin-bottom:.25rem;}}
+  @media (max-width:576px){.d-flex.flex-column.flex-sm-row{flex-direction:column!important;} .btn-sm{padding:10px 16px;font-size:14px;}}
+</style>
+
+<script>
+  function loadMoreRequests() {
+    // Implementation for loading more requests
+    console.log('Load more requests functionality');
+  }
+</script>
+{% endblock %}

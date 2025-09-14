@@ -1,0 +1,42 @@
+{% extends "admin/login.html" %}
+
+{% block title %}Smruti Sharing Admin Portal{% endblock %}
+
+{% block content %}
+<div style="text-align:center; margin-bottom:20px;">
+    <h2 style="color:#6c5ce7; font-weight:bold;">Smruti Sharing Admin Portal</h2>
+    <p style="color:#ffffff;">Welcome back! Please log in to continue.</p>
+</div>
+{{ block.super }}
+{% endblock %}
+
+{% block extrastyle %}
+<style>
+    body.login {
+        background: linear-gradient(135deg, #6c5ce7, #00cec9);
+        font-family: 'Inter', sans-serif;
+    }
+    #container {
+        border-radius: 15px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+        padding: 20px;
+    }
+    input[type="text"], input[type="password"] {
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+    input[type="submit"] {
+        background: #6c5ce7;
+        border-radius: 8px;
+        border: none;
+        padding: 10px 15px;
+        font-weight: bold;
+        transition: 0.3s ease;
+    }
+    input[type="submit"]:hover {
+        background: #00cec9;
+        color: white;
+    }
+</style>
+{% endblock %}

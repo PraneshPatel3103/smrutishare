@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8 col-xl-7">
+    <div class="glass-card p-4 p-md-5 animate-scale-in">
+      <div class="text-center mb-4">
+        <div class="mb-3">
+          <i class="fas fa-file-alt fa-3x text-white opacity-75"></i>
+        </div>
+        <h2 class="title-responsive fw-bold mb-2">Create New Request</h2>
+        <p class="text-responsive opacity-75 mb-0">Fill out the form below to submit your request</p>
+      </div>
+      
+      <form method="post" enctype="multipart/form-data" class="animate-fade-in">
+        {% csrf_token %}
+        
+        <!-- Personal Information Section -->
+        <div class="mb-4">
+          <h5 class="mb-3 d-flex align-items-center">
+            <i class="fas fa-user me-2 text-primary"></i>
+            <span>Personal Information</span>
+          </h5>
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">
+                <i class="fas fa-user me-1"></i>Your Name
+              </label>
+              {{ form.customer_name }}
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">
+                <i class="fas fa-envelope me-1"></i>Your Email
+              </label>
+              {{ form.customer_email }}
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">
+                <i class="fas fa-phone me-1"></i>Your Phone (WhatsApp)
+              </label>
+              {{ form.customer_phone }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Request Details Section -->
+        <div class="mb-4">
+          <h5 class="mb-3 d-flex align-items-center">
+            <i class="fas fa-calendar-alt me-2 text-success"></i>
+            <span>Request Details</span>
+          </h5>
+          <div class="row g-3">
+            <div class="col-6 col-md-4">
+              <label class="form-label">
+                <i class="fas fa-calendar me-1"></i>Date
+              </label>
+              {{ form.date }}
+            </div>
+            <div class="col-6 col-md-4">
+              <label class="form-label">
+                <i class="fas fa-clock me-1"></i>Time
+              </label>
+              {{ form.time }}
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label">
+                <i class="fas fa-map-marker-alt me-1"></i>Location
+              </label>
+              {{ form.location }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Information Section -->
+        <div class="mb-4">
+          <h5 class="mb-3 d-flex align-items-center">
+            <i class="fas fa-info-circle me-2 text-warning"></i>
+            <span>Additional Information</span>
+          </h5>
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">
+                <i class="fas fa-image me-1"></i>Reference Image or File
+              </label>
+              <div class="position-relative">
+                {{ form.reference_image }}
+                <small class="form-text text-white-50 mt-1 d-block">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Upload any reference image or file (Optional)
+                </small>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">
+                <i class="fas fa-sticky-note me-1"></i>Additional Notes
+              </label>
+              {{ form.note }}
+              <small class="form-text text-white-50 mt-1 d-block">
+                <i class="fas fa-lightbulb me-1"></i>
+                Provide any additional details or special requirements
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold">
+            <i class="fas fa-paper-plane me-2"></i>
+            Submit Request
+          </button>
+          <a href="{% url 'dashboard' %}" class="btn btn-outline-light">
+            <i class="fas fa-arrow-left me-2"></i>
+            Back to Dashboard
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .form-control, .form-select { min-height:48px; }
+  textarea.form-control{min-height:120px;resize:vertical;}
+  h5 { color: var(--heading-color); font-weight:600; border-bottom:2px solid var(--divider-color); padding-bottom:8px; }
+  .text-primary{color:var(--primary-grad-end)!important;} 
+  .text-success{color:#45d483!important;} 
+  .text-warning{color:var(--accent-grad-end)!important;}
+  @media (max-width:768px){.glass-card{margin:16px 8px;} .col-6{margin-bottom:1rem;} .btn-lg{padding:16px 24px;font-size:18px;}}
+</style>
+{% endblock %}

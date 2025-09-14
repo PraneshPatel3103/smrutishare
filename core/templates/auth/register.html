@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-7 col-xl-6">
+    <div class="glass-card p-4 p-md-5 animate-scale-in">
+      <div class="text-center mb-4">
+        <div class="mb-3">
+          <i class="fas fa-user-plus fa-3x text-white opacity-75"></i>
+        </div>
+        <h2 class="title-responsive fw-bold mb-2">Create Account</h2>
+        <p class="text-responsive opacity-75 mb-0">Join us and start managing your requests</p>
+      </div>
+
+      <form method="post" enctype="multipart/form-data" class="animate-fade-in" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger mb-4">
+            {% for error in form.non_field_errors %}
+              <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Account Information Section -->
+        <div class="mb-4">
+          <h5 class="mb-3 d-flex align-items-center">
+            <i class="fas fa-user-circle me-2 text-primary"></i>
+            <span>Account Information</span>
+          </h5>
+          <div class="row g-3 align-items-start">
+            <!-- Left Column: Username + Password -->
+            <div class="col-12 col-md-6">
+              <div class="mb-3 mb-md-4">
+                <label class="form-label"><i class="fas fa-user me-1"></i>Username</label>
+                <div class="field-wrapper">{{ form.username }}</div>
+                {% if form.username.errors %}
+                  <div class="text-danger small mt-1">
+                    {% for error in form.username.errors %}
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              <div class="mb-0 password-group">
+                <label class="form-label"><i class="fas fa-lock me-1"></i>Password</label>
+                <div class="field-wrapper position-relative password-wrapper">
+                  {{ form.password }}
+                  <button type="button" class="password-toggle position-absolute top-50 translate-middle-y" aria-label="Show password" title="Show password">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+                {% if form.password.errors %}
+                  <div class="text-danger small mt-1">
+                    {% for error in form.password.errors %}
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            <!-- Right Column: Email + Confirm Password -->
+            <div class="col-12 col-md-6">
+              <div class="mb-3 mb-md-4">
+                <label class="form-label"><i class="fas fa-envelope me-1"></i>Email Address</label>
+                <div class="field-wrapper">{{ form.email }}</div>
+                {% if form.email.errors %}
+                  <div class="text-danger small mt-1">
+                    {% for error in form.email.errors %}
+                      <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              <div class="mb-0 confirm-password-group">
+                <label class="form-label"><i class="fas fa-lock me-1"></i>Confirm Password</label>
+                <div class="field-wrapper position-relative password-wrapper">
+                  <input type="password" name="confirm_password" id="confirm_password" class="form-control" placeholder="Re-enter password" required>
+                  <button type="button" class="password-toggle position-absolute top-50 translate-middle-y" aria-label="Show password" title="Show password" data-target="confirm_password">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+                <div class="text-danger small mt-1 d-none" id="confirm-password-error">
+                  <i class="fas fa-exclamation-circle me-1"></i>Passwords do not match.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="mb-4">
+          <h5 class="mb-3 d-flex align-items-center">
+            <i class="fas fa-image me-2 text-success"></i>
+            <span>Profile Picture</span>
+          </h5>
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label"><i class="fas fa-camera me-1"></i>Upload Profile Picture (Optional)</label>
+              <div class="field-wrapper">{{ form.profile_picture }}</div>
+              {% if form.profile_picture.errors %}
+                <div class="text-danger small mt-1">
+                  {% for error in form.profile_picture.errors %}
+                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+              <small class="form-text text-white-50 mt-1 d-block">
+                <i class="fas fa-info-circle me-1"></i>Recommended: Square image, max 5MB
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Information Section -->
+        <div class="mb-4">
+          <h5 class="mb-3 d-flex align-items-center">
+            <i class="fas fa-phone me-2 text-warning"></i>
+            <span>Contact Information</span>
+          </h5>
+          <!-- Row 1: Primary Phone + Primary Type -->
+          <div class="row g-3 mb-2">
+            <div class="col-12 col-md-6">
+              <label class="form-label"><i class="fas fa-phone me-1"></i>Primary Phone</label>
+              <div class="field-wrapper">{{ form.primary_phone }}</div>
+              {% if form.primary_phone.errors %}
+                <div class="text-danger small mt-1">
+                  {% for error in form.primary_phone.errors %}
+                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label"><i class="fas fa-tag me-1"></i>Primary Type</label>
+                <div class="field-wrapper select-wrapper">{{ form.primary_type }}</div>
+              {% if form.primary_type.errors %}
+                <div class="text-danger small mt-1">
+                  {% for error in form.primary_type.errors %}
+                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          <!-- Row 2: Secondary Phone + Secondary Type -->
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label"><i class="fas fa-phone me-1"></i>Secondary Phone</label>
+              <div class="field-wrapper">{{ form.secondary_phone }}</div>
+              {% if form.secondary_phone.errors %}
+                <div class="text-danger small mt-1">
+                  {% for error in form.secondary_phone.errors %}
+                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label"><i class="fas fa-tag me-1"></i>Secondary Type</label>
+                <div class="field-wrapper select-wrapper">{{ form.secondary_type }}</div>
+              {% if form.secondary_type.errors %}
+                <div class="text-danger small mt-1">
+                  {% for error in form.secondary_type.errors %}
+                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold">
+            <i class="fas fa-user-plus me-2"></i>Create Account
+          </button>
+          <a href="{% url 'login' %}" class="btn btn-outline-light">
+            <i class="fas fa-arrow-left me-2"></i>Back to Login
+          </a>
+        </div>
+      </form>
+
+      <div class="text-center mt-4 pt-3 border-top border-white-25">
+        <p class="mb-0 text-white-75">Already have an account?
+          <a href="{% url 'login' %}" class="text-white fw-semibold text-decoration-none">Sign in here <i class="fas fa-arrow-right ms-1"></i></a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  h5 { color: var(--heading-color); font-weight:600; border-bottom:2px solid var(--divider-color); padding-bottom:8px; }
+  .text-primary{color:var(--primary-grad-end)!important;}
+  .text-success{color:#45d483!important;}
+  .text-warning{color:var(--accent-grad-end)!important;}
+  .text-danger{color:#ff512f!important;}
+  .text-white-75{color:var(--muted-text-dark)!important;}
+  .text-white-50{color:var(--muted-text-darker)!important;}
+  .border-white-25{border-color:var(--divider-color)!important;}
+  .alert-danger{margin-top:4px;}
+  /* Ensure uniform look if some widgets lack form-control */
+  .field-wrapper :is(input, select){ width:100%; display:block; }
+  .password-wrapper input { padding-right:50px; }
+  .password-toggle { right:10px; border:none; background:transparent; padding:0 6px; color:var(--text-color); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem; line-height:1; }
+  .password-toggle:hover, .password-toggle:focus { color:var(--primary-grad-end); outline:none; }
+  body.theme-light .password-toggle { color:#425267; }
+  body.theme-light .password-toggle:hover { color:var(--primary-grad-end); }
+  .password-toggle i { pointer-events:none; }
+  .password-toggle.active i:before { content:"\f070"; }
+  #confirm_password.is-invalid { border-color:#ff512f !important; box-shadow:0 0 0 3px rgba(255,81,47,0.35); }
+  body.theme-light #confirm_password.is-invalid { box-shadow:0 0 0 3px rgba(255,81,47,0.25); }
+  #confirm_password.is-valid { border-color:var(--primary-grad-end) !important; box-shadow:0 0 0 3px rgba(35,162,246,0.35); }
+  body.theme-light #confirm_password.is-valid { box-shadow:0 0 0 3px rgba(35,162,246,0.25); }
+  #confirm-password-error i { color:#ff512f; }
+  /* Custom select arrow */
+  .select-wrapper { position:relative; }
+  .select-wrapper select { appearance:none; -webkit-appearance:none; -moz-appearance:none; padding-right:42px; }
+  .select-wrapper::after { content:"\f078"; /* fa-chevron-down */ font-family:"Font Awesome 6 Free"; font-weight:900; position:absolute; top:50%; right:14px; transform:translateY(-50%); pointer-events:none; color:var(--text-color); opacity:.75; transition:var(--transition); }
+  body.theme-light .select-wrapper::after { color:#425267; }
+  .select-wrapper:hover::after { opacity:1; color:var(--primary-grad-end); }
+  .select-wrapper select:focus + .focus-ring, .select-wrapper select:focus-visible { outline:none; }
+  @media (max-width:768px){ .glass-card{margin:16px 8px;} .col-12.col-md-6{margin-bottom:1rem;} }
+</style>
+
+<script>
+  (function(){
+    // Ensure form-control class present
+    document.querySelectorAll('.field-wrapper input, .field-wrapper select').forEach(el => {
+      if(!el.classList.contains('form-control')) el.classList.add('form-control');
+    });
+
+    // Password visibility toggles
+    document.querySelectorAll('.password-wrapper').forEach(wrapper => {
+      const input = wrapper.querySelector('input');
+      const toggle = wrapper.querySelector('.password-toggle');
+      if(!input || !toggle) return;
+      let visible = false;
+      toggle.addEventListener('click', () => {
+        visible = !visible;
+        input.type = visible ? 'text' : 'password';
+        toggle.classList.toggle('active', visible);
+        toggle.setAttribute('aria-label', visible ? 'Hide password' : 'Show password');
+        toggle.setAttribute('title', visible ? 'Hide password' : 'Show password');
+      });
+    });
+
+    // Frontend confirm password validation
+    const formEl = document.querySelector('form');
+    const pwdInput = formEl ? (formEl.querySelector('input[name="password"], #id_password, #password')) : null;
+    const confirmInput = document.getElementById('confirm_password');
+    const errorBox = document.getElementById('confirm-password-error');
+
+    function validateMatch(showFeedback=true){
+      if(!pwdInput || !confirmInput) return true;
+      const match = confirmInput.value.trim() === pwdInput.value.trim();
+      if(confirmInput.value.length === 0){
+        confirmInput.classList.remove('is-invalid','is-valid');
+        if(errorBox) errorBox.classList.add('d-none');
+        return false;
+      }
+      if(match){
+        confirmInput.classList.remove('is-invalid');
+        confirmInput.classList.add('is-valid');
+        if(errorBox) errorBox.classList.add('d-none');
+      } else if(showFeedback){
+        confirmInput.classList.remove('is-valid');
+        confirmInput.classList.add('is-invalid');
+        if(errorBox) errorBox.classList.remove('d-none');
+      }
+      return match;
+    }
+
+    ['input','blur','keyup','change'].forEach(evt => {
+      if(confirmInput) confirmInput.addEventListener(evt, () => validateMatch(false));
+      if(pwdInput) pwdInput.addEventListener(evt, () => validateMatch(false));
+    });
+
+    if(formEl){
+      formEl.addEventListener('submit', e => {
+        if(!validateMatch(true)){
+          e.preventDefault();
+          confirmInput && confirmInput.focus();
+        }
+      });
+    }
+  })();
+</script>
+{% endblock %}

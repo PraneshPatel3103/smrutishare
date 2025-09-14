@@ -15,8 +15,11 @@ DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # --- Railway Deployment Settings ---
 # This is the most important security setting.
-ALLOWED_HOSTS = []
-CSRF_TRUSTED_ORIGINS = []
+ALLOWED_HOSTS = [
+    'hpsmrutishare.up.railway.app',
+    '127.0.0.1', # Keep for local development
+    'localhost', ]
+CSRF_TRUSTED_ORIGINS = ['hpsmrutishare.up.railway.app']
 
 RAILWAY_STATIC_URL = os.environ.get('RAILWAY_STATIC_URL')
 if RAILWAY_STATIC_URL:

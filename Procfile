@@ -1,1 +1,1 @@
-web: gunicorn HPDATA_REQUEST.wsgi
+web: gunicorn config.wsgi
